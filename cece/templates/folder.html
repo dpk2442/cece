@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if data["links"] %}
+        <ul>
+        {% for id in data["links"] %}
+            <li>
+                <a href="{{ make_id_url(id) }}">
+                    {{ guides[id]["short_name"] }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -35,5 +35,10 @@ def natural_sort(lst, key=lambda x: x):
 
 
 def makedirs(path):
-    if not os.path.isdir(path):
+    if path and not os.path.isdir(path):
         os.makedirs(path)
+
+
+def iterate_list_subsets(lst):
+    for i in range(1, len(lst) + 1):
+        yield lst[:i]

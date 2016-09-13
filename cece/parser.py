@@ -6,6 +6,15 @@ import fnmatch
 import os
 
 
+def _get_breadcrumbs(path):
+    path = os.path.dirname(path)
+    breadcrumbs = []
+    while path:
+        breadcrumbs.insert(0, path)
+        path = os.path.dirname(path)
+    return breadcrumbs
+
+
 class ParsingException(Exception):
     
     def __init__(self, path, message):
@@ -27,6 +36,13 @@ class Parser(object):
         cur_dir = os.getcwd()
         os.chdir("guides")
 
+        self._contents[""] = {
+            "type": "folder",
+            "links": [],
+            "name": self._config["site_title"],
+            "short_name": self._config["site_title"],
+            "breadcrumbs": []
+        }
         for f in os.listdir("."):
             self._load_dirs(f)
         for folder in filter(lambda x: x["type"] == "folder", self._contents.values()):
@@ -44,11 +60,16 @@ class Parser(object):
                 if self._load_dirs(child_folder_path):
                     child_links.append(child_folder_path)
 
+        # add link to folder to parent
+        self._contents[os.path.dirname(path)]["links"].append(path)
+        # add entry for folder
         self._contents[path] = {
             "type": "folder",
             "links": child_links,
             "name": meta["name"],
-            "description": meta["description"]
+            "short_name": meta["name"],
+            "description": meta["description"],
+            "breadcrumbs": _get_breadcrumbs(path)
         }
 
     def _load_guide(self, meta, path):
@@ -57,7 +78,9 @@ class Parser(object):
             "type": "folder",
             "links": [],
             "name": meta["name"],
-            "description": meta["description"]
+            "short_name": meta["name"],
+            "description": meta["description"],
+            "breadcrumbs": _get_breadcrumbs(path)
         }
 
         for variant_src_path in fnmatch.filter(os.listdir(path), "*.md"):
@@ -83,9 +106,10 @@ class Parser(object):
                         .format(expected_variant_group["name"]))
 
             # create entries for variant tags if they don't exist
-            parent = path
-            for variant_tag in actual_tags:
-                tag_id = os.path.join(parent, variant_tag)
+            for variant_tags in cece.util.iterate_list_subsets(actual_tags[:-1]):
+                current_tag = variant_tags[-1]
+                parent = os.path.join(path, *variant_tags[:-1])
+                tag_id = os.path.join(path, *variant_tags)
                 if not tag_id in self._contents:
                     # add tag to parent links
                     self._contents[parent]["links"].append(tag_id)
@@ -93,18 +117,25 @@ class Parser(object):
                     self._contents[tag_id] = {
                         "type": "folder",
                         "links": [],
-                        "name": meta["name"],
-                        "description": meta["description"]
+                        "name": "{} ({})".format(meta["name"], ", ".join(self._config["variants"][variant_tag]["name"] for variant_tag in variant_tags)),
+                        "short_name": self._config["variants"][current_tag]["name"],
+                        "description": meta["description"],
+                        "breadcrumbs": _get_breadcrumbs(tag_id)
                     }
-                parent = tag_id
             
             # create entry for variant
+            current_tag = actual_tags[-1]
+            parent = os.path.join(path, *actual_tags[:-1])
             variant_id = os.path.join(path, *actual_tags)
+            # add variant to parent links
+            self._contents[parent]["links"].append(variant_id)
             self._contents[variant_id] = {
                 "type": "page",
-                "name": meta["name"],
+                "name": "{} ({})".format(meta["name"], ", ".join(self._config["variants"][actual_tag]["name"] for actual_tag in actual_tags)),
+                "short_name": self._config["variants"][current_tag]["name"],
                 "description": meta["description"],
-                "source_path": os.path.join(os.getcwd(), variant_full_path)
+                "source_path": os.path.join(os.getcwd(), variant_full_path),
+                "breadcrumbs": _get_breadcrumbs(variant_id)
             }
 
     def _load_dirs(self, root_dir):

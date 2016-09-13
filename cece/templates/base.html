@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ site_title }} | {{ data["name"] }}</title>
+</head>
+<body>
+
+    <h1><a href="/">{{ data["name"] }}</a></h1>
+
+    {% if data["breadcrumbs"] %}
+        <ul>
+        {% for id in data["breadcrumbs"] %}
+            <li>
+                <a href="{{ make_id_url(id) }}">
+                    {{ guides[id]["short_name"] }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>
