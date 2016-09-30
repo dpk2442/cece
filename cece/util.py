@@ -20,7 +20,9 @@ def merge_nested_dicts(base, *dicts):
         nested, the nested dictionaries are recursively merged.
 
         :param base: The base dictionary
+        :type base: dict
         :param dicts: The list of dictionaries to extend the base with
+        :type dicts: list
         :returns: The base dictionary
     """
 
@@ -42,6 +44,7 @@ def load_yaml_file(path):
         Open and read a file, convert the contents to yaml, and close the file.
 
         :param path: Path to the yaml file
+        :type path: string
         :returns: The parsed yaml file contents
     """
 
@@ -58,7 +61,9 @@ def natural_sort(lst, key=lambda x: x):
         Python's built in sort function.
 
         :param lst: The list to sort
+        :type lst: list
         :param key: The key function to use
+        :type key: function
     """
 
     def natural_key(obj):
@@ -72,6 +77,7 @@ def makedirs(path):
         Safely make a directory by ensuring every parent directory is created.
 
         :param path: The directory to create
+        :type path: string
     """
 
     if path and not os.path.isdir(path):
@@ -93,6 +99,7 @@ def iterate_list_subsets(lst):
         * ``[1, 2, 3, 4, 5]``
 
         :param lst: The list to iterate
+        :type lst: list
         :returns: An iterator over the sublists
     """
 
