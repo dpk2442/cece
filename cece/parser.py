@@ -1,3 +1,10 @@
+"""
+.. module cece.parser
+
+The parser reads the files and metadata from the file system, and builds a list
+of files to write out to the file system.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -7,6 +14,21 @@ import os
 
 
 def _get_breadcrumbs(path):
+    """
+        A utility method for getting the breadcrumb links from a path. They are
+        built by repeatedly taking the dirname of the path.
+
+        For example, ``"category1/category2/variant1/variant2"`` would produce:
+        .. code-block:: python
+
+            [
+                "category1",
+                "category1/category2",
+                "category1/category2/variant1",
+                "category1/category2/variant1/variant2"
+            ]
+    """
+
     path = os.path.dirname(path)
     breadcrumbs = []
     while path:
@@ -16,18 +38,39 @@ def _get_breadcrumbs(path):
 
 
 class ParsingException(Exception):
+    """
+        A custom exception that is thrown when there are errors parsing the
+        files.
+
+        :param path: The path of the file that raised the exception
+        :type path: string
+        :param message: The error message
+        :type message: string
+    """
     
     def __init__(self, path, message):
         super(ParsingException, self).__init__("{}: {}".format(path, message))
 
 
 class Parser(object):
+    """
+        The parser object.
+
+        :param config: The configuration
+        :type config: dict
+    """
 
     def __init__(self, config):
         self._config = config
         self._contents = None
 
     def parse(self):
+        """
+            Parse the files and cache the parsed result.
+
+            :returns: The parsed files, as a dictionary
+        """
+
         if self._contents:
             return self._contents
 
@@ -53,6 +96,15 @@ class Parser(object):
         return self._contents
 
     def _load_folder(self, meta, path):
+        """
+            Load the contents of a folder into the cache.
+
+            :param meta: The meta data for the folder
+            :type meta: dict
+            :param path: The path of the folder
+            :type path: string
+        """
+
         child_links = []
         for child_folder in os.listdir(path):
             child_folder_path = os.path.join(path, child_folder)
@@ -73,6 +125,15 @@ class Parser(object):
         }
 
     def _load_guide(self, meta, path):
+        """
+            Load the contents of the guide into the cache.
+
+            :param meta: The meta data for the guide
+            :type meta: dict
+            :param path: The path to the guide folder
+            :type path: string
+        """
+
         # add entry for main guide folder
         self._contents[path] = {
             "type": "folder",
@@ -139,6 +200,13 @@ class Parser(object):
             }
 
     def _load_dirs(self, root_dir):
+        """
+            Load a directory and its children.
+
+            :param root_dir: The path to the root dir to parse
+            :type root_dir: string
+        """
+
         folder_meta_path = os.path.join(root_dir, "folder_meta.yaml")
         guide_meta_path = os.path.join(root_dir, "guide_meta.yaml")
 
