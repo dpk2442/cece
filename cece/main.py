@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 import cece.compiler
 import cece.parser
 import future.utils
-import json
 
 
 def main():

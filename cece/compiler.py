@@ -15,6 +15,7 @@ import markdown
 import os
 import shutil
 
+
 class Compiler(object):
     """
         The compiler object.
