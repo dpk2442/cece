@@ -1,3 +1,9 @@
+"""
+.. module cece.main
+
+The main module for cece. This contains the entry point for the application.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -8,6 +14,10 @@ import json
 
 
 def main():
+    """
+        The main entry point for cece.
+    """
+
     # load config
     config = cece.util.load_yaml_file("config.yaml")
     config["variants"] = {}
