@@ -1,3 +1,10 @@
+"""
+.. module cece.compiler
+
+The compiler takes a parsed set of guides and compiles and writes the output to
+the file system.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -9,6 +16,14 @@ import os
 import shutil
 
 class Compiler(object):
+    """
+        The compiler object.
+
+        :param config: The configuration
+        :type config: dict
+        :param guides: The parsed set of guides to output
+        :type guides: dict
+    """
 
     def __init__(self, config, guides):
         self._config = config
@@ -18,9 +33,21 @@ class Compiler(object):
         self._template_env.globals["make_id_url"] = self._make_id_url
 
     def _make_id_url(self, id):
+        """
+            Make url from an id.
+
+            :param id: The id to form into a url
+            :type id: string
+        """
+
         return "/{}/".format(id.replace("\\", "/"))
 
     def compile(self):
+        """
+            Compile the provided guides and write out the result to the file
+            system.
+        """
+
         if os.path.isdir("build"):
             shutil.rmtree("build")
         os.mkdir("build")
@@ -37,6 +64,16 @@ class Compiler(object):
         os.chdir(cur_dir)
 
     def _compile_folder(self, path, folder):
+        """
+            Compile a folder, which is a listing of links to other folders or
+            pages.
+
+            :param path: The path of the folder
+            :type path: string
+            :param folder: The data for the folder
+            :type folder: dict
+        """
+
         # make directories
         cece.util.makedirs(path)
 
@@ -51,6 +88,15 @@ class Compiler(object):
             f.write(source)
 
     def _compile_page(self, path, page):
+        """
+            Compile a page.
+
+            :param path: The path of the page
+            :type path: string
+            :param page: The data for the page
+            :type page: dict
+        """
+
         # make directories
         cece.util.makedirs(path)
 
