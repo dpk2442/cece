@@ -18,8 +18,7 @@ def _get_breadcrumbs(path):
         A utility method for getting the breadcrumb links from a path. They are
         built by repeatedly taking the dirname of the path.
 
-        For example, ``"category1/category2/variant1/variant2"`` would produce:
-        .. code-block:: python
+        For example, ``"category1/category2/variant1/variant2"`` would produce::
 
             [
                 "category1",
