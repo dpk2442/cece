@@ -9,34 +9,8 @@ from __future__ import unicode_literals
 
 import os
 import re
+import sys
 import yaml
-
-
-def merge_nested_dicts(base, *dicts):
-    """
-        Merge multiple dictionaries together. The first dictionary is treated as
-        the base dictionary, and is modified by overwriting properties with the
-        values of the other dicts, in order. If a value within the dict is
-        nested, the nested dictionaries are recursively merged.
-
-        :param base: The base dictionary
-        :type base: dict
-        :param dicts: The list of dictionaries to extend the base with
-        :type dicts: list
-        :returns: The base dictionary
-    """
-
-    if not isinstance(base, dict):
-        raise TypeError("The supplied arguments must be dictionaries.")
-    for d in dicts:
-        if not isinstance(d, dict):
-            raise TypeError("The supplied arguments must be dictionaries.")
-        for key in d:
-            if key in base and isinstance(base[key], dict) and isinstance(d[key], dict):
-                base[key] = merge_nested_dicts(base[key], d[key])
-            else:
-                base[key] = d[key]
-    return base
 
 
 def load_yaml_file(path):
@@ -48,8 +22,13 @@ def load_yaml_file(path):
         :returns: The parsed yaml file contents
     """
 
-    with open(path, "r") as f:
-        return yaml.load(f.read())
+    try:
+        with open(path, "r") as f:
+            return yaml.load(f)
+    except yaml.YAMLError as e:
+        print("Error parsing \"{0}\":".format(path))
+        print(e)
+        sys.exit(1)
 
 
 def natural_sort(lst, key=lambda x: x):

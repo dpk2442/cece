@@ -70,14 +70,13 @@ class Parser(object):
             :returns: The parsed files, as a dictionary
         """
 
-        if self._contents:
-            return self._contents
-
         self._contents = {}
 
+        # move into the guides source directory
         cur_dir = os.getcwd()
         os.chdir("guides")
 
+        # the empty string is the root folder
         self._contents[""] = {
             "type": "folder",
             "links": [],
@@ -85,11 +84,16 @@ class Parser(object):
             "short_name": self._config["site_title"],
             "breadcrumbs": []
         }
+
+        # add entries for all folders in the root directory
         for f in os.listdir("."):
             self._load_dirs(f)
+
+        # sort the child links for each folder using natural sort
         for folder in filter(lambda x: x["type"] == "folder", self._contents.values()):
             cece.util.natural_sort(folder["links"], key=lambda x: self._contents[x]["name"])
 
+        # change back to the original directory
         os.chdir(cur_dir)
 
         return self._contents
@@ -104,10 +108,13 @@ class Parser(object):
             :type path: string
         """
 
+        # load the children
         child_links = []
         for child_folder in os.listdir(path):
             child_folder_path = os.path.join(path, child_folder)
+            # if the child directory is a folder, load it
             if os.path.isdir(child_folder_path):
+                # if the load succeeds, add the child to the list of children links
                 if self._load_dirs(child_folder_path):
                     child_links.append(child_folder_path)
 
@@ -143,16 +150,23 @@ class Parser(object):
             "breadcrumbs": _get_breadcrumbs(path)
         }
 
+        # loop through all markdown files
         for variant_src_path in fnmatch.filter(os.listdir(path), "*.md"):
             variant_full_path = os.path.join(path, variant_src_path)
 
-            # verify variant tags
+            # verify that only one variant of each group is in the file name,
+            # and that all variant groups have a variant
             variant_tags = os.path.splitext(variant_src_path)[0].split("-")
             actual_tags = []
-            for expected_variant_group in meta["variant_groups"]:
-                expected_variant_group = self._config["variant_groups"][expected_variant_group]
+            # iterate over each expected variant group
+            for expected_variant_group_key in meta["variant_groups"]:
+                expected_variant_group = self._config["variant_groups"][expected_variant_group_key]
                 found_one = False
+                # loop over variants in expected group
                 for variant in expected_variant_group["variants"]:
+                    # if the current variant is in the list of tags, do the following:
+                    # if it is new, append it to the actual tags
+                    # if one was previously found, raise an exception
                     if variant["id"] in variant_tags:
                         if found_one:
                             raise ParsingException(
@@ -161,6 +175,7 @@ class Parser(object):
                                 .format(expected_variant_group["name"]))
                         actual_tags.append(variant["id"])
                         found_one = True
+                # if no variants in the expected group were found, raise an exception
                 if not found_one:
                     raise ParsingException(
                         variant_full_path,
@@ -172,6 +187,8 @@ class Parser(object):
                 current_tag = variant_tags[-1]
                 parent = os.path.join(path, *variant_tags[:-1])
                 tag_id = os.path.join(path, *variant_tags)
+                # this tag may have been added already as a parent of another
+                # tag, so check that first
                 if tag_id not in self._contents:
                     # add tag to parent links
                     self._contents[parent]["links"].append(tag_id)

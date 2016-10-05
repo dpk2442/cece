@@ -49,19 +49,23 @@ class Compiler(object):
             system.
         """
 
+        # clean existing build
         if os.path.isdir("build"):
             shutil.rmtree("build")
         os.mkdir("build")
 
+        # move into the build directory
         cur_dir = os.getcwd()
         os.chdir("build")
 
+        # compile the guides
         for path, value in future.utils.viewitems(self._guides):
             if value["type"] == "folder":
                 self._compile_folder(path, value)
             elif value["type"] == "page":
                 self._compile_page(path, value)
 
+        # move back to the starting directory
         os.chdir(cur_dir)
 
     def _compile_folder(self, path, folder):
