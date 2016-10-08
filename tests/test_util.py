@@ -23,8 +23,7 @@ class TestLoadYamlFile(unittest.TestCase):
 
         test_dict = {"test": "test_value"}
 
-        # mock the functions
-        mock_open.return_value = mock.MagicMock(spec=file)
+        # mock the load function
         mock_yaml_load.return_value = test_dict
 
         # call the method to test
@@ -47,8 +46,7 @@ class TestLoadYamlFile(unittest.TestCase):
 
         yaml_error = yaml.YAMLError("yaml error")
 
-        # mock the functions
-        mock_open.return_value = mock.MagicMock(spec=file)
+        # mock the load function
         mock_yaml_load.side_effect = yaml_error
 
         # call the method
