@@ -1,0 +1,14 @@
+language: python
+python:
+    - "2.7"
+    - "3.3"
+    - "3.4"
+    - "3.5"
+install:
+    - pip install --user -r requirements.txt
+    - pip install --user -r requirements_docs.txt
+    - pip install --user -r requirements_test.txt
+script:
+    - flake8
+    - nosetests
+    - (cd docs && make dummy)
