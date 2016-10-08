@@ -14,7 +14,7 @@ class TestLoadYamlFile(unittest.TestCase):
     """ Test ``cece.util.load_yaml_file`` """
 
     @mock.patch("cece.util.yaml.load")
-    @mock.patch("cece.util.open")
+    @mock.patch("cece.util.open", create=True)
     def test_success(self, mock_open, mock_yaml_load):
         """
             Test the success case where the file opens as expected, and parsing
@@ -36,12 +36,12 @@ class TestLoadYamlFile(unittest.TestCase):
         self.assertEqual(test_dict, returned_dict)
 
     @mock.patch("cece.util.sys.exit")
-    @mock.patch("cece.util.print")
+    @mock.patch("cece.util.print", create=True)
     @mock.patch("cece.util.yaml.load")
-    @mock.patch("cece.util.open")
+    @mock.patch("cece.util.open", create=True)
     def test_yaml_error(self, mock_open, mock_yaml_load, mock_print, mock_exit):
         """
-            Test the case where the yaml parsing raises and error.
+            Test the case where the yaml parsing raises an error.
         """
 
         yaml_error = yaml.YAMLError("yaml error")
