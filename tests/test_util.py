@@ -134,7 +134,8 @@ class TestIterateListSubsets(unittest.TestCase):
 
         lst = []
         actual = list(cece.util.iterate_list_subsets(lst))
-        self.assertEqual([], actual,
+        self.assertEqual(
+            [], actual,
             "No iterations should occur on an empty list.")
 
     def test_normal(self):
